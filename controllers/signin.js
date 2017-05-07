@@ -7,7 +7,7 @@ module.exports = {
     ctx.render('signin.html',{
       name:`路人${name}`
     });
-  }
+  },
   'POST /signin' :async (ctx,next)=>{
     index++;
     let name = ctx.request.body.name || '路人甲';
@@ -20,7 +20,7 @@ module.exports = {
     console.log(`设置cookie值：${value}`);
     ctx.cookies.set('name',value);
     ctx.response.redirect('/');
-  }
+  },
   'GET /signout' :async (ctx,next)=>{
     ctx.cookies.set('name','');
     ctx.response.redirect('/signin');

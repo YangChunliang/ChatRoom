@@ -25,6 +25,10 @@ app.use(async (ctx,next)=>{
   await next();
 });
 
+// static file support:
+let staticFiles = require('./static-files');
+app.use(staticFiles('/static/', __dirname + '/static'));
+
 //注册request body
 app.use(bodyParser());
 
@@ -35,7 +39,7 @@ app.use(templating('views',{
 }));
 
 //注册控制逻辑
-app.use(controller);
+app.use(controller());
 
 //创建koa服务器
 let server = app.listen(3000);
@@ -146,5 +150,5 @@ function onClose(){
   this.wss.broadcast(msg);
 }
 
-app.wss = createWebSocketServer(server,onConnect,onMessage,onClose);
+app.wss = createWebSocketServer(server,onConnection,onMessage,onClose);
 console.log('服务器已经在3000端口挂起。。。');

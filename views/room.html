@@ -1,0 +1,140 @@
+{% extends "base.html" %} {% block main %}
+
+<script>
+
+function addToUserList(list, user) {
+    var i;
+    for (i=0; i<list.length; i++) {
+        if (list[i].id === user.id) {
+            return;
+        }
+    }
+    list.push(user);
+}
+
+function removeFromUserList(list, user) {
+    var i, target = -1;
+    for (i=0; i<list.length; i++) {
+        if (list[i].id === user.id) {
+            target = i;
+            break;
+        }
+    }
+    if (target >= 0) {
+        list.splice(target, 1);
+    }
+}
+
+function addMessage(list, msg) {
+    list.push(msg);
+    $('#message-list').parent().animate({
+        scrollTop: $('#message-list').height()
+    }, 1000);
+}
+
+$(function () {
+    var vmMessageList = new Vue({
+        el: '#message-list',
+        data: {
+            messages: []
+        }
+    });
+    var vmUserList = new Vue({
+        el: '#user-list',
+        data: {
+            users: []
+        }
+    });
+
+    var ws = new WebSocket('ws://localhost:3000/ws/chat');
+
+    ws.onmessage = function(event) {
+        var data = event.data;
+        console.log(data);
+        var msg = JSON.parse(data);
+        if (msg.type === 'list') {
+            vmUserList.users = msg.data;
+        } else if (msg.type === 'join') {
+            addToUserList(vmUserList.users, msg.user);
+            addMessage(vmMessageList.messages, msg);
+        } else if (msg.type === 'left') {
+            removeFromUserList(vmUserList.users, msg.user);
+            addMessage(vmMessageList.messages, msg);
+        } else if (msg.type === 'chat') {
+            addMessage(vmMessageList.messages, msg);
+        }
+    };
+
+    ws.onclose = function (evt) {
+        console.log('[closed] ' + evt.code);
+        var input = $('#form-chat').find('input[type=text]');
+        input.attr('placeholder', 'WebSocket disconnected.');
+        input.attr('disabled', 'disabled');
+        $('#form-chat').find('button').attr('disabled', 'disabled');
+    };
+
+    ws.onerror = function (code, msg) {
+        console.log('[ERROR] ' + code + ': ' + msg);
+    };
+
+    $('#form-chat').submit(function (e) {
+        e.preventDefault();
+        var input = $(this).find('input[type=text]');
+        var text = input.val().trim();
+        console.log('[chat] ' + text);
+        if (text) {
+            input.val('');
+            ws.send(text);
+        }
+    });
+});
+</script>
+
+<div>
+  <h3>聊天室</h3>
+  <div id="message-list">
+      <div style="margin-bottom:25px;" v-for="msg in messages">
+          <div v-if="msg.type === 'join' || msg.type === 'left'">
+              <div>
+                  <img style="width:20px; height:20px;" v-bind:src="'/static/images/' + msg.user.image + '.png'">
+              </div>
+              <div>
+                  <h4 v-text="msg.data"></h4>
+              </div>
+          </div>
+          <div v-if="msg.type === 'chat'">
+              <div>
+                  <div>
+                      <img style="width:48px; height:48px;" v-bind:src="'/static/images/' + msg.user.image + '.png'">
+                  </div>
+                  <div>
+                      <h4 v-text="msg.user.name"></h4>
+                      <span v-text="msg.data"></span>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  <form id="form-chat" action="#0">
+      <div>
+          <input type="text" placeholder="A good day, isn't it?">
+          <button type="submit">Go</button>
+      </div>
+  </form>
+
+  <h3>用户列表</h3>
+  <div id="user-list">
+      <div v-for="user in users">
+          <div>
+              <img style="width:20px; height:20px;" v-bind:src="'/static/images/' + user.image + '.png'">
+          </div>
+          <div>
+              <h4 v-text="user.name + ' (' + user.id + ')'"></h4>
+          </div>
+      </div>
+  </div>
+  <form action="/signout" method="get">
+      <button type="submit" class="btn btn-primary">Sign out</button>
+  </form>
+</div>
+{% endblock %}
