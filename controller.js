@@ -1,4 +1,4 @@
-const js = require('js');
+const fs = require('fs');
 
 function addMapping(router,mapping) {
   for (var url in mapping) {
