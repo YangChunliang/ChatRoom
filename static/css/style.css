@@ -1,0 +1,40 @@
+body,html{
+  height:100%;
+}
+.body_box{
+  position: relative;
+  height:100%;
+  /*background: url("/static/images/background.jpg");*/
+}
+.body_box img{
+  width:100%;
+  height: 100%;
+}
+.body_box form{
+  margin-top: -14%;
+  margin-left: 37%;
+}
+
+.body_box label{
+  font-size: 18px;
+  color: #fff;
+  font-weight: normal;
+}
+.body_box button{
+  color: #fff;
+  border:solid #fff 2px;
+  background: transparent;
+  width:60px;
+  font-size: 18px;
+}
+.body_box input{
+  font-size: 18px;
+  color: #fff;
+  border:solid #fff 2px;
+  background: transparent;
+  padding-left: 0.5em;
+}
+.body_box button:hover{
+  color: green;
+  border:solid green 2px;
+}

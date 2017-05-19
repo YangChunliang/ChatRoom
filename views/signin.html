@@ -1,10 +1,10 @@
 {% extends "base.html" %} {% block main %}
-<form action="/signin" method="post">
-    <div>
-        <label>Name</label>
-        <input type="text" name="name" placeholder="你的昵称" value="{{ name }}">
-        <p>Your user name</p>
-    </div>
-    <button type="submit">Sign In</button>
-</form>
+<div class="body_box">
+  <img src="/static/images/background.jpg" alt="">
+  <form action="/signin" method="post">
+    <label>你的昵称</label>
+    <input type="text" name="name" placeholder="你的昵称" value="{{ name }}">
+    <button type="submit">登录</button>
+  </form>
+</div>
 {% endblock %}
